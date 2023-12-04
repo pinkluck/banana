@@ -3,9 +3,8 @@
 import pygame
 
 from helpers import *
-#from fish import Fish
 from ship import Ship
-from Cannon import Cannonball
+from Cannon import *
 
 # pygame setup
 pygame.init()
@@ -19,16 +18,19 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 # Make my background once!
 background = make_background(screen)
 
-print(pygame.font.get_fonts())
 #declare a Font
 game_font = pygame.font.SysFont('flanella', 120)
 
+#set up music with auido file
+pygame.mixer.music.load('images/drunkensailor.mp3')
+pygame.mixer.music.set_volume(.5)
+pygame.mixer.music.play(-1)
+cannonsound = pygame.mixer.Sound('images/explosion-91872.wav')
 #makes cannonball sprite group
 cannonball_group = pygame.sprite.Group()
-
+ship_group = pygame.sprite.Group()
 # make a boat instance
 ship1 = Ship(screen)
-ship_group = pygame.sprite.Group()
 ship_group.add(ship1)
 #make a 2nd boat
 ship2 = Ship(screen)
@@ -37,6 +39,7 @@ ship_group.add(ship2)
 running = True
 while running:
     # pygame.QUIT event means the user clicked X to close your window
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -52,14 +55,14 @@ while running:
                 ship1.velocity -=1
             if event.key == pygame.K_DOWN:
                 #if less than 1 cannonballs exist drop a grenade if you get a space
-                if len(cannonball_group) < 1:
-                    cannonball_group.add(Cannonball(ship2.rect.midbottom))
+                    cannonsound.play()
+                    cannonball_group.add(Cannonball(ship2.rect.midtop, ship_group, ship2.rect.centerx, ship2.rect.centery-50))
+
             if event.key == pygame.K_s:
-                if len(cannonball_group) < 1:
-                    cannonball_group.add(Cannonball(ship1.rect.midbottom))
+                cannonsound.play()
+                cannonball_group.add(Cannonball(ship1.rect.midbottom,ship_group, ship1.rect.centerx, ship1.rect.centery-50))
 
     # update my groups
-    #fish_group.update()
     ship_group.update()
     cannonball_group.update()
 
@@ -73,7 +76,6 @@ while running:
 
     #draw cannonball
     cannonball_group.draw(screen)
-    # draw our fish
     # draw the boat
     ship_group.draw(screen)
 
